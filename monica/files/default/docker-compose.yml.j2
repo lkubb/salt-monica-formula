@@ -1,0 +1,35 @@
+version: "3.4"
+
+services:
+  app:
+    image: {{ monica.lookup.containers.monica.image }}
+    ports:
+      - {{ monica.host_port }}:80
+    env_file:
+      - monica.env
+    volumes:
+      - {{ monica.lookup.paths.data or "monica-data" }}:/var/www/html/storage
+    restart: unless-stopped
+    depends_on:
+      - db
+
+  db:
+    image: {{ monica.lookup.containers.db.image }}
+    env_file:
+      - db.env
+    volumes:
+      - {{ monica.lookup.paths.db or "monica-db" }}:/var/lib/mysql
+    restart: unless-stopped
+
+{%- if not monica.lookup.paths.data or not monica.lookup.paths.db  %}
+
+volumes:
+{%-   if not monica.lookup.paths.data %}
+  monica-data:
+    name: monica-data
+{%-   endif %}
+{%-   if not monica.lookup.paths.db %}
+  monica-db:
+    name: monica-db
+{%-   endif %}
+{%- endif %}
