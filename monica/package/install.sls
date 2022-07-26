@@ -22,6 +22,8 @@ Monica CRM user session is initialized at boot:
   compose.lingering_managed:
     - name: {{ monica.lookup.user.name }}
     - enable: {{ monica.install.rootless }}
+    - require:
+      - user: {{ monica.lookup.user.name }}
 
 Monica CRM paths are present:
   file.directory:

@@ -33,6 +33,9 @@ Monica CRM user session is not initialized at boot:
   compose.lingering_managed:
     - name: {{ monica.lookup.user.name }}
     - enable: false
+    - onlyif:
+      - fun: user.info
+        name: {{ monica.lookup.user.name }}
 
 Monica CRM user account is absent:
   user.absent:
@@ -40,6 +43,9 @@ Monica CRM user account is absent:
     - purge: {{ monica.install.remove_all_data_for_sure }}
     - require:
       - Monica CRM is absent
+    - retry:
+        attempts: 5
+        interval: 2
 
 {%- if monica.install.remove_all_data_for_sure %}
 
