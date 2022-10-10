@@ -71,3 +71,15 @@ Monica CRM is installed:
     - require:
       - user: {{ monica.lookup.user.name }}
 {%- endif %}
+
+{%- if monica.install.autoupdate_service is not none %}
+
+Podman autoupdate service is managed for Monica CRM:
+{%-   if monica.install.rootless %}
+  compose.systemd_service_{{ "enabled" if monica.install.autoupdate_service else "disabled" }}:
+    - user: {{ monica.lookup.user.name }}
+{%-   else %}
+  service.{{ "enabled" if monica.install.autoupdate_service else "disabled" }}:
+{%-   endif %}
+    - name: podman-auto-update.timer
+{%- endif %}

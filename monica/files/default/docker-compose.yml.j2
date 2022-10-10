@@ -6,7 +6,11 @@ services:
     ports:
       - {{ monica.host_port }}:80
     env_file:
-      - monica.env
+      - {{ monica.lookup.paths.config_monica }}
+{%- if monica.install.autoupdate %}
+    labels:
+      - io.containers.autoupdate=registry
+{%- endif %}
     volumes:
       - {{ monica.lookup.paths.data or "monica-data" }}:/var/www/html/storage
     restart: unless-stopped
@@ -16,7 +20,11 @@ services:
   db:
     image: {{ monica.lookup.containers.db.image }}
     env_file:
-      - db.env
+      - {{ monica.lookup.paths.config_db }}
+{%- if monica.install.autoupdate %}
+    labels:
+      - io.containers.autoupdate=registry
+{%- endif %}
     volumes:
       - {{ monica.lookup.paths.db or "monica-db" }}:/var/lib/mysql
     restart: unless-stopped

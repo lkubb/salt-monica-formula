@@ -44,6 +44,8 @@ monica:
         image: docker.io/library/monica:apache
   install:
     rootless: true
+    autoupdate: true
+    autoupdate_service: false
     remove_all_data_for_sure: false
   config:
     allow_statistics_through_public_api_access: false

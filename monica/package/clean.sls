@@ -8,6 +8,18 @@
 include:
   - {{ sls_config_clean }}
 
+{%- if monica.install.autoupdate_service %}
+
+Podman autoupdate service is disabled for Monica CRM:
+{%-   if monica.install.rootless %}
+  compose.systemd_service_disabled:
+    - user: {{ monica.lookup.user.name }}
+{%-   else %}
+  service.disabled:
+{%-   endif %}
+    - name: podman-auto-update.timer
+{%- endif %}
+
 Monica CRM is absent:
   compose.removed:
     - name: {{ monica.lookup.paths.compose }}
