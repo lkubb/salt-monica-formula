@@ -15,5 +15,6 @@ Monica CRM environment files are absent:
     - names:
       - {{ monica.lookup.paths.config_monica }}
       - {{ monica.lookup.paths.config_db }}
+      - {{ monica.lookup.paths.base | path_join(".saltcache.yml") }}
     - require:
       - sls: {{ sls_service_clean }}
