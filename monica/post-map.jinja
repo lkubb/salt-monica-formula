@@ -21,22 +21,35 @@
     Automatically generate secrets if they were not specified.
 -#}
 
-{%- for key, secret, length in [
-            ("config:app", "key", 32),
-            ("config:hash", "salt", 64),
-            ("config:db", "password", 64),
-] %}
-  {%- if not mapdata | traverse(key ~ ":" ~ secret) %}
-    {#- This has been deprecated and will be removed in v3005 @FIXME -#}
-    {%- do mapdata | update_dict_key_value(key,
-          {
-            secret: salt["grains.get_or_set_hash"](
-                      'monica.' ~ key | replace(":", ".") ~ "." ~ secret,
-                      length=length,
-                      chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-                    )
-          }
-        )
-    %}
-  {%- endif %}
-{%- endfor %}
+{#- Since grains.get_or_set_hash was removed in v3005, cache generated secrets -#}
+{%- set current_cached = {} -%}
+{%- set cache_updated = [] -%}
+{%- set cache_file = mapdata.lookup.paths.base | path_join(".saltcache.yml") -%}
+{%- if salt["file.file_exists"](cache_file) -%}
+  {%- do current_cached.update(salt["jinja.import_yaml"](cache_file)) -%}
+{%- else -%}
+  {%- do salt["file.mkdir"](mapdata.lookup.paths.base) -%}
+{%- endif -%}
+
+{%- for var, val in current_cached.items() -%}
+  {%- do mapdata | set_dict_key_value(var, val) -%}
+{%- endfor -%}
+
+{%- for secret, length in [
+      ("config:app:key", 32),
+      ("config:hash:salt", 64),
+      ("config:db:password", 64),
+    ] -%}
+  {%- if not mapdata | traverse(secret) -%}
+    {%- do current_cached.update({secret: salt["random.get_str"](length, punctuation=false)}) -%}
+    {%- do cache_updated.append(true) -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- if cache_updated -%}
+  {%- for var, val in current_cached.items() -%}
+    {%- do mapdata | set_dict_key_value(var, val) -%}
+  {%- endfor -%}
+  {%- do salt["file.write"](cache_file, salt["slsutil.serialize"]("yaml", current_cached)) -%}
+  {%- do salt["file.set_mode"](cache_file, "0600") -%}
+{%- endif -%}
