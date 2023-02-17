@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 # vim: ft=sls
 
-{%- set tplroot = tpldir.split('/')[0] %}
+{%- set tplroot = tpldir.split("/")[0] %}
 {%- from tplroot ~ "/map.jinja" import mapdata as monica with context %}
 {%- from tplroot ~ "/libtofs.jinja" import files_switch with context %}
 
@@ -35,11 +34,28 @@ Monica CRM paths are present:
     - require:
       - user: {{ monica.lookup.user.name }}
 
+{%- if monica.install.podman_api %}
+
+Monica CRM podman API is enabled:
+  compose.systemd_service_enabled:
+    - name: podman
+    - user: {{ monica.lookup.user.name }}
+    - require:
+      - Monica CRM user session is initialized at boot
+
+Monica CRM podman API is available:
+  compose.systemd_service_running:
+    - name: podman
+    - user: {{ monica.lookup.user.name }}
+    - require:
+      - Monica CRM user session is initialized at boot
+{%- endif %}
+
 Monica CRM compose file is managed:
   file.managed:
     - name: {{ monica.lookup.paths.compose }}
-    - source: {{ files_switch(['docker-compose.yml', 'docker-compose.yml.j2'],
-                              lookup='Monica CRM compose file is present'
+    - source: {{ files_switch(["docker-compose.yml", "docker-compose.yml.j2"],
+                              lookup="Monica CRM compose file is present"
                  )
               }}
     - mode: '0644'

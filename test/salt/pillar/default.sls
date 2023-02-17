@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # vim: ft=yaml
 ---
 monica:
@@ -47,6 +46,7 @@ monica:
     autoupdate: true
     autoupdate_service: false
     remove_all_data_for_sure: false
+    podman_api: true
   config:
     allow_statistics_through_public_api_access: false
     app:
