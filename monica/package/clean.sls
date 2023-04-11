@@ -51,7 +51,7 @@ Monica CRM compose file is absent:
 
 Monica CRM podman API is unavailable:
   compose.systemd_service_dead:
-    - name: podman
+    - name: podman.socket
     - user: {{ monica.lookup.user.name }}
     - onlyif:
       - fun: user.info
@@ -59,7 +59,7 @@ Monica CRM podman API is unavailable:
 
 Monica CRM podman API is disabled:
   compose.systemd_service_disabled:
-    - name: podman
+    - name: podman.socket
     - user: {{ monica.lookup.user.name }}
     - onlyif:
       - fun: user.info
