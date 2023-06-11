@@ -1,6 +1,5 @@
 # vim: ft=sls
 
-
 {#-
     Stops the monica, db container services
     and disables them at boot time.
