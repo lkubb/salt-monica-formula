@@ -34,3 +34,4 @@ Monica CRM service is running:
 {%- endif %}
     - watch:
       - Monica CRM is installed
+      - sls: {{ sls_config_file }}

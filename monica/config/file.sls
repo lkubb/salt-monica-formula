@@ -34,7 +34,7 @@ Monica CRM environment files are managed:
     - template: jinja
     - require:
       - user: {{ monica.lookup.user.name }}
-    - watch_in:
+    - require_in:
       - Monica CRM is installed
     - context:
         monica: {{ monica | json }}
