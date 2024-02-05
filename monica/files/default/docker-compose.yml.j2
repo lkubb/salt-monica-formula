@@ -1,3 +1,12 @@
+{%- set data_is_network_mount = false -%}
+{%- if monica.lookup.paths.data -%}
+{%-   set data_is_network_mount = salt["cmd.run_stdout"](
+        "df -P '{data}' | ".format(data=monica.lookup.paths.data) ~
+          "awk 'BEGIN {e=1} $NF ~ /^\/.+/ { e=0 ; print $1 ; exit } END { exit e }'",
+        python_shell=true
+) -%}
+{%- endif -%}
+---
 version: "3.4"
 
 services:
@@ -12,7 +21,7 @@ services:
       - io.containers.autoupdate=registry
 {%- endif %}
     volumes:
-      - {{ monica.lookup.paths.data or "monica-data" }}:/var/www/html/storage
+      - {{ monica.lookup.paths.data or "monica-data" }}:/var/www/html/storage{%- if not data_is_network_mount %}:Z{%- endif %}
     restart: unless-stopped
     depends_on:
       - db
@@ -26,7 +35,7 @@ services:
       - io.containers.autoupdate=registry
 {%- endif %}
     volumes:
-      - {{ monica.lookup.paths.db or "monica-db" }}:/var/lib/mysql
+      - {{ monica.lookup.paths.db or "monica-db" }}:/var/lib/mysql:Z
     restart: unless-stopped
 
 {%- if not monica.lookup.paths.data or not monica.lookup.paths.db  %}
